@@ -26,7 +26,8 @@ class TestServer {
         let props = Object.getOwnPropertyNames(TestServer.prototype).sort();
 
         for (let i = 0; i < props.length; i++) {
-            if (props[i].startsWith("test")) {
+            if (typeof TestServer.prototype[props[i]] === "function" &&
+                props[i].startsWith("test")) {
                 this[props[i]]();
 
                 // TestServer.prototype[props[i]].call(this, 997);
