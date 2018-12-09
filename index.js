@@ -29,6 +29,8 @@ const server = require("./server");
 server.init();
 
 // Unit Testing
-const testServer = require("./tests/test_server");
+const TestServer = require("./tests/test_server");
+const TestRunner = require("./tests/test_runner");
 
-testServer.runAll();
+let runner = new TestRunner([TestServer]);
+runner.runAll();
