@@ -18,5 +18,12 @@ handlers.hello = async function(data) {
 };
 
 handlers.notFound = async function() {
-    return {status: 400, payload: "Bad request"};
+    return {status: 404, payload: "Not found"};
 };
+
+handlers.echo = async function() {
+    console.log("ECHO!!!");
+    return {status: 200, payload: "echo!"};
+};
+
+module.exports = handlers;

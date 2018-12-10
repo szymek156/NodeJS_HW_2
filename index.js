@@ -34,3 +34,7 @@ const TestRunner = require("./tests/test_runner");
 
 let runner = new TestRunner([TestServer]);
 runner.runAll();
+
+setTimeout(() => {
+    process.exit();
+}, 500);

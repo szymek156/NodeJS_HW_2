@@ -5,6 +5,11 @@ const url           = require("url");
 
 let server = {};
 
+server.router = {
+    users: handlers.users,
+    echo: handlers.echo
+};
+
 server.unifiedServer = function(req, res) {
     let decoder = new StringDecoder("utf-8");
 
@@ -48,10 +53,6 @@ server.unifiedServer = function(req, res) {
     });
 };
 
-
-server.router = {
-    users: handlers.users
-};
 
 server.httpServer = http.createServer(server.unifiedServer);
 
