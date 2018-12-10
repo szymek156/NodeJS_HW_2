@@ -76,6 +76,7 @@ class TestRunner {
             }
         });
 
+
         // console.log(`${color.FgMagenta} [ Summary ] ${color.Reset}`);
 
         // if (this.failedTests.length) {
