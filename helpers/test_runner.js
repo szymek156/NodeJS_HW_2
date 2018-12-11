@@ -2,7 +2,7 @@
  * No NPM? Fine, my own test runner
  */
 
-const color = require("./../helpers/console_colors");
+const color = require("./console_colors");
 
 // TODO: Serialize execution !!!
 
@@ -15,12 +15,15 @@ class TestRunner {
             // starting as test*. Proxy returns function where test* is wrapped by setUp and
             // tearDown functions.
             let proxy = new Proxy(new FixtureClass, {
-                get: function(target, prop, receiver) {
+                get : function(target, prop, receiver) {
                     // Wrap functions starting with test* to with setUp and tearDown methods, and
                     // bunker with try catches
                     if (typeof target[prop] === "function" && prop.startsWith("test")) {
                         return async function(...argArray) {
                             try {
+                                console.log(`${color.FgMagenta} [ Executing ] ${
+                                    target.constructor.name}.${prop} ...${color.Reset}`);
+
                                 target.setUp();
                                 await target[prop].call(target, ...argArray);
 
@@ -75,7 +78,6 @@ class TestRunner {
                 }
             }
         });
-
 
         // console.log(`${color.FgMagenta} [ Summary ] ${color.Reset}`);
 
