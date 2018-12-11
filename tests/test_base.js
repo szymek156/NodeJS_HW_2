@@ -14,11 +14,17 @@ class TestBase {
                 let decoder = new StringDecoder("utf-8");
                 let buffer  = "";
 
-                res.on("data", function(chunk) { buffer += decoder.write(chunk); });
+                res.on("data", function(chunk) {
+                    buffer += decoder.write(chunk);
+                });
                 res.on("end", function() {
                     buffer += decoder.end();
-                    resolve({res : res, payload : buffer});
+                    resolve({res: res, payload: buffer});
                 });
+            });
+
+            req.on("error", (e) => {
+                console.error(`!!!!!!!!!!!!!! problem with request: ${e.message}`);
             });
 
             if (payload) {
