@@ -5,14 +5,14 @@
 const color = require("./console_colors");
 
 class TestRunner {
-    constructor(testFixtures = []) {
-        this.failedTests  = [];
-        this.testFixtures = testFixtures.map((FixtureClass) => {
-            // testFixtures collection contains Class types of fixtures, create instances of them,
+    constructor(testSuites = []) {
+        this.failedTests = [];
+        this.testSuites  = testSuites.map((SuiteClass) => {
+            // testSuites collection contains Class types of Suites, create instances of them,
             // and opaque it up with proxy object. Proxy will intercept function calls with name
             // starting as test*. Proxy returns function where test* is wrapped by setUp and
             // tearDown functions.
-            let proxy = new Proxy(new FixtureClass, {
+            let proxy = new Proxy(new SuiteClass, {
                 get: function(target, prop, receiver) {
                     // Wrap functions starting with test* to with setUp and tearDown methods, and
                     // bunker with try catches
@@ -25,7 +25,6 @@ class TestRunner {
                             color.Reset}`;
 
                         let fail = `${color.FgRed} [ FAIL ] ${target.constructor.name}.${prop},`;
-
 
                         return async function(...argArray) {
                             try {
@@ -65,30 +64,27 @@ class TestRunner {
 
     // THIS ASTERISK HERE defines a generator
     * TestGenerator() {
-        for (let i = 0; i < this.testFixtures.length; i++) {
-            let fixture = this.testFixtures[i];
+        for (let i = 0; i < this.testSuites.length; i++) {
+            let suite = this.testSuites[i];
 
             // Collect properties of Class Type
-            let classType = Object.getPrototypeOf(fixture);
+            let classType = Object.getPrototypeOf(suite);
             // Sort, because branch prediction, hmm actually should be randomized, whatever
             let properties = Object.getOwnPropertyNames(classType).sort();
 
-            console.log(
-                `${color.FgMagenta}[Executing] ${classType.constructor.name} ${color.Reset}`);
+            console.log(`${color.FgMagenta} [ Executing Test Suite ] ${
+                classType.constructor.name} ${color.Reset}`);
 
             for (let i = 0; i < properties.length; i++) {
                 if (typeof classType[properties[i]] === "function" &&
                     properties[i].startsWith("test")) {
-                    yield fixture[properties[i]];
+                    yield suite[properties[i]];
                 }
             }
         }
     }
 
     async runAll() {
-        // :)
-        process.stdout.write("\x07");
-
         let testIterator = this.TestGenerator();
 
         // Thanks to generator + await powers, tests are executing in serialized order,
@@ -111,13 +107,15 @@ class TestRunner {
             }
         }
 
-        console.log(` ${color.FgMagenta}[Summary] ${color.Reset}`);
+        console.log(` ${color.FgMagenta}[ Summary ] ${color.Reset}`);
 
         if (this.failedTests.length) {
             console.log(` ${color.FgRed} Failed tests: ${this.failedTests.length} ${color.Reset}`);
             console.log(` ${color.FgRed} ${this.failedTests} ${color.Reset}`);
         } else {
-            console.log(` ${color.FgGreen}[ALL CLEAN!] ${color.Reset}`);
+            console.log(` ${color.FgGreen}[ === ALL CLEAN! === ] ${color.Reset}`);
+            // :)
+            process.stdout.write("\x07");
         }
     }
 }

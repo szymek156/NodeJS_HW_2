@@ -61,8 +61,7 @@ class TestUser extends TestBase {
     }
 
     async testUserCanBeCreatedAndFetched() {
-        let user = {name: "Simon", email: "Simon@theClouds.com", address: "5th Ave str"};
-
+        let user           = {name: "Simon", email: "Simon@theClouds.com", address: "5th Ave str"};
         let {res, payload} = await this.createUser(user);
 
         let postUser = JSON.parse(payload);
@@ -79,8 +78,7 @@ class TestUser extends TestBase {
     }
 
     async testUserWithMissingPropsCannotBeCreated() {
-        let user = {name: "Andrew", email: "Andrew@theClouds.com"};
-
+        let user           = {name: "Andrew", email: "Andrew@theClouds.com"};
         let {res, payload} = await this.createUser(user);
 
         assert(res.statusCode == 400);
@@ -91,8 +89,7 @@ class TestUser extends TestBase {
     }
 
     async testUserWithInvalidPropsCannotBeCreated() {
-        let user = {name: "Andrew", email: "Andrew@theClouds.com", address: 345};
-
+        let user           = {name: "Andrew", email: "Andrew@theClouds.com", address: 345};
         let {res, payload} = await this.createUser(user);
 
         assert(res.statusCode == 400);
@@ -104,7 +101,6 @@ class TestUser extends TestBase {
 
     async testUserCannotBeCreatedTwice() {
         let user = {name: "Crystal", email: "Crystal@theClouds.com", address: "5th Ave str"};
-
         let {res, payload} = await this.createUser(user);
 
         assert(res.statusCode == 200);
@@ -123,8 +119,7 @@ class TestUser extends TestBase {
     }
 
     async testUserCanBeUpdated() {
-        let user = {name: "Joey", email: "Joey@theClouds.com", address: "Redmond"};
-
+        let user           = {name: "Joey", email: "Joey@theClouds.com", address: "Redmond"};
         let {res, payload} = await this.createUser(user);
 
         assert(res.statusCode == 200);
@@ -145,8 +140,7 @@ class TestUser extends TestBase {
     }
 
     async testUserCanBeUpdatedAllAtOnce() {
-        let user = {name: "Joey", email: "Joey@theClouds.com", address: "Redmond"};
-
+        let user           = {name: "Joey", email: "Joey@theClouds.com", address: "Redmond"};
         let {res, payload} = await this.createUser(user);
 
         assert(res.statusCode == 200);
@@ -167,7 +161,7 @@ class TestUser extends TestBase {
 
         assert(res.statusCode == 200);
 
-        let {res: resUpdate, payload: payloadUpdate} = this.updateUser({});
+        let {res: resUpdate, payload: payloadUpdate} = await this.updateUser({});
 
         assert(resUpdate.statusCode == 400);
     }
