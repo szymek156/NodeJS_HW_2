@@ -15,7 +15,7 @@ class TestRunner {
             // starting as test*. Proxy returns function where test* is wrapped by setUp and
             // tearDown functions.
             let proxy = new Proxy(new FixtureClass, {
-                get : function(target, prop, receiver) {
+                get: function(target, prop, receiver) {
                     // Wrap functions starting with test* to with setUp and tearDown methods, and
                     // bunker with try catches
                     if (typeof target[prop] === "function" && prop.startsWith("test")) {
@@ -24,6 +24,7 @@ class TestRunner {
                                 console.log(`${color.FgMagenta} [ Executing ] ${
                                     target.constructor.name}.${prop} ...${color.Reset}`);
 
+                                console.log(`${color.FgCyan} ${prop} SETUP & CALL ${color.Reset}`);
                                 target.setUp();
                                 await target[prop].call(target, ...argArray);
 
@@ -39,6 +40,8 @@ class TestRunner {
 
                             } finally {
                                 try {
+                                    console.log(`${color.FgCyan} ${prop} TEARDOWN ${color.Reset}`);
+
                                     target.tearDown();
                                 } catch (err) {
                                     console.log(`${color.FgRed} [ FAIL ] ${

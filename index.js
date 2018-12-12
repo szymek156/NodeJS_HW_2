@@ -26,7 +26,6 @@
 // there's no need to setup any DNS for your domain for this task
 // https://documentation.mailgun.com/en/latest/faqs.html#how-do-i-pick-a-domain-name-for-my-mailgun-account
 
-"use strict";
 const server = require("./server");
 
 server.init();
@@ -40,4 +39,4 @@ let runner = new TestRunner([/*TestServer,*/ TestUser]);
 
 runner.runAll();
 
-setTimeout(() => process.exit(), 1000);
+// setTimeout(() => process.exit(), 1000);

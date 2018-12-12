@@ -2,9 +2,10 @@ const fs      = require("fs");
 const path    = require("path");
 const util    = require("util");
 const helpers = require("./helpers");
+const config  = require("./../config");
 
 var lib = {
-    baseDir: path.join(__dirname, "/../.data"),
+    baseDir: config.DB_ROOT,
     create: function(dir, filename, data, callback) {
         fs.open(path.join(lib.baseDir, dir, filename + ".json"), "wx", function(err, fd) {
             if (!err && fd) {
@@ -96,7 +97,6 @@ lib.list = function(dir, callback) {
         }
     });
 };
-
 
 // Promisified version, because I can't look on those callbacks.
 let libp = {};

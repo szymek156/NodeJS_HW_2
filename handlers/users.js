@@ -49,7 +49,37 @@ users.post = async function(data) {
     }
 };
 users.put = async function(data) {
+    let user = JSON.parse(data.payload);
 
+    let update = {
+        name: validate.parameter(user.name, "string"),
+        email: validate.parameter(user.email, "string"),
+        address: validate.parameter(user.address, "string")
+    }
+
+    if (!update.email && !(update.name || update.address)) {
+        return {status: 400, payload: "Incorect parameters"};
+    }
+
+    try {
+        let user = await _data.read(USER_DB, update.email);
+
+        if (update.name) {
+            user.name = update.name;
+        }
+
+        if (update.address) {
+            user.address = update.address;
+        }
+
+        await _data.update(USER_DB, update.email, user);
+
+        return {status: 200, payload: user};
+
+    } catch (err) {
+        console.log("!!!! failed with ", err);
+        return {status: 400, payload: err};
+    }
 };
 users.delete = async function(data) {
 
