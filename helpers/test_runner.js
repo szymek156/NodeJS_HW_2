@@ -98,7 +98,9 @@ class TestRunner {
         // tearDown()
         // ...
 
+        let totalTest = 0;
         for (let test of testIterator) {
+            totalTest++;
             // Proxy will intercept this call
             try {
                 await test();
@@ -108,6 +110,7 @@ class TestRunner {
         }
 
         console.log(` ${color.FgMagenta}[ Summary ] ${color.Reset}`);
+        console.log(` ${color.FgMagenta}[ Run Tests: ${totalTest} ] ${color.Reset}`);
 
         if (this.failedTests.length) {
             console.log(` ${color.FgRed} Failed tests: ${this.failedTests.length} ${color.Reset}`);

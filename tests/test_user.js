@@ -44,6 +44,23 @@ class TestUser extends TestBase {
         return await this.syncRequest(requestDetails, getData);
     }
 
+    async deleteUser(email) {
+        let getData = JSON.stringify(email);
+
+
+        let requestDetails = {
+            protocol: "http:",
+            hostname: "localhost",
+            method: "DELETE",
+            path: "/users",
+            port: config.port,
+            headers:
+                {"Content-Type": "application/json", "Content-Length": Buffer.byteLength(getData)}
+        };
+
+        return await this.syncRequest(requestDetails, getData);
+    }
+
     async updateUser(user) {
         let strUser = JSON.stringify(user);
 
@@ -164,6 +181,26 @@ class TestUser extends TestBase {
         let {res: resUpdate, payload: payloadUpdate} = await this.updateUser({});
 
         assert(resUpdate.statusCode == 400);
+    }
+
+    async testUserCanBeDeleted() {
+        let user = {name: "Daep", email: "Daep@theClouds.com", address: "Northen Cascades"};
+
+        let {res, payload} = await this.createUser(user);
+
+        assert(res.statusCode == 200);
+
+        let {res: resDelete, payload: payloadDelete} = await this.deleteUser({email: user.email});
+
+        assert(resDelete.statusCode == 200);
+    }
+
+    async testUserCantBeDeletedIfNotExists() {
+        let user = {name: "Daep", email: "Daep@theClouds.com", address: "Northen Cascades"};
+
+        let {res: resDelete, payload: payloadDelete} = await this.deleteUser({email: user.email});
+
+        assert(resDelete.statusCode == 400);
     }
 }
 

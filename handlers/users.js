@@ -81,8 +81,21 @@ users.put = async function(data) {
         return {status: 400, payload: err};
     }
 };
-users.delete = async function(data) {
+users.delete = async function(bytes) {
+    let obj   = JSON.parse(bytes.payload);
+    let email = validate.parameter(obj.email, "string");
 
+    if (!email) {
+        return {status: 400, payload: "Incorect parameters"};
+    }
+
+    try {
+        let user = await _data.delete(USER_DB, email);
+        return {status: 200, payload: user};
+
+    } catch (err) {
+        return {status: 400, payload: err};
+    }
 };
 
 module.exports = users;
