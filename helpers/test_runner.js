@@ -14,6 +14,8 @@
 //  TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 //
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
+//
+// Author: https://github.com/szymek156
 
 
 const color = require("./console_colors");
