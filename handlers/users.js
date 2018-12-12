@@ -24,7 +24,7 @@ users.get = async function(bytes) {
 
 // Req param: name, email, address
 users.post = async function(data) {
-    console.log("Received payload: ", data.payload);
+    // console.log("Received payload: ", data.payload);
 
     let user = JSON.parse(data.payload);
 

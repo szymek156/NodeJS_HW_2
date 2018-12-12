@@ -4,8 +4,6 @@
 
 const color = require("./console_colors");
 
-// TODO: Serialize execution !!!
-
 class TestRunner {
     constructor(testFixtures = []) {
         this.failedTests  = [];
@@ -19,34 +17,39 @@ class TestRunner {
                     // Wrap functions starting with test* to with setUp and tearDown methods, and
                     // bunker with try catches
                     if (typeof target[prop] === "function" && prop.startsWith("test")) {
+                        // Moved those messagess to cleanup execution flow a little...
+                        let executing = `${color.FgMagenta} [ Executing ] ${
+                            target.constructor.name}.${prop} ...${color.Reset}`;
+
+                        let pass = `${color.FgGreen} [ PASS ] ${target.constructor.name}.${prop} ${
+                            color.Reset}`;
+
+                        let fail = `${color.FgRed} [ FAIL ] ${target.constructor.name}.${prop},`;
+
+
                         return async function(...argArray) {
                             try {
-                                console.log(`${color.FgMagenta} [ Executing ] ${
-                                    target.constructor.name}.${prop} ...${color.Reset}`);
+                                console.log(executing);
 
-                                console.log(`${color.FgCyan} ${prop} SETUP & CALL ${color.Reset}`);
                                 target.setUp();
                                 await target[prop].call(target, ...argArray);
 
-                                console.log(`${color.FgGreen} [ PASS ] ${target.constructor.name}.${
-                                    prop} ${color.Reset}`);
+                                console.log(pass);
 
                             } catch (err) {
-                                let message = `${color.FgRed} [ FAIL ] ${target.constructor.name}.${
-                                    prop}, reason: \n\t ${err} ${color.Reset}`
+                                let message = fail + ` reason: \n\t ${err} ${color.Reset}`;
                                 console.log(message);
-
-                                // throw new Error(message);
+                                throw new Error(message);
 
                             } finally {
                                 try {
-                                    console.log(`${color.FgCyan} ${prop} TEARDOWN ${color.Reset}`);
-
+                                    // No matter the result, clean up after yourself!
                                     target.tearDown();
                                 } catch (err) {
-                                    console.log(`${color.FgRed} [ FAIL ] ${
-                                        target.constructor.name}.tearDown !!!, reason: \n\t ${
-                                        err} ${color.Reset}`);
+                                    let message =
+                                        fail + `.tearDown!!!, reason: \n\t ${err} ${color.Reset}`;
+                                    console.log(message);
+                                    throw new Error(message);
                                 }
                             }
                         };
@@ -60,38 +63,62 @@ class TestRunner {
         });
     }
 
-    runAll() {
-        this.testFixtures.forEach((fixture) => {
+    // THIS ASTERISK HERE defines a generator
+    * TestGenerator() {
+        for (let i = 0; i < this.testFixtures.length; i++) {
+            let fixture = this.testFixtures[i];
+
             // Collect properties of Class Type
             let classType = Object.getPrototypeOf(fixture);
             // Sort, because branch prediction, hmm actually should be randomized, whatever
-            let props = Object.getOwnPropertyNames(classType).sort();
+            let properties = Object.getOwnPropertyNames(classType).sort();
 
             console.log(
-                `${color.FgMagenta} [ Executing ] ${classType.constructor.name} ${color.Reset}`);
+                `${color.FgMagenta}[Executing] ${classType.constructor.name} ${color.Reset}`);
 
-            for (let i = 0; i < props.length; i++) {
-                if (typeof classType[props[i]] === "function" && props[i].startsWith("test")) {
-                    // Proxy will intercept this call
-                    try {
-                        fixture[props[i]]();
-                    } catch (err) {
-                        this.failedTests.push(err.message);
-                    }
+            for (let i = 0; i < properties.length; i++) {
+                if (typeof classType[properties[i]] === "function" &&
+                    properties[i].startsWith("test")) {
+                    yield fixture[properties[i]];
                 }
             }
-        });
+        }
+    }
 
-        // console.log(`${color.FgMagenta} [ Summary ] ${color.Reset}`);
+    async runAll() {
+        // :)
+        process.stdout.write("\x07");
 
-        // if (this.failedTests.length) {
-        //     console.log(`${color.FgRed} Failed tests: ${this.failedTests.length}
-        //     ${color.Reset}`);
+        let testIterator = this.TestGenerator();
 
-        //     console.log(`${color.FgRed} ${this.failedTests} ${color.Reset}`);
-        // } else {
-        //     console.log(`${color.FgGreen} [ ALL CLEAN! ] ${color.Reset}`);
-        // }
+        // Thanks to generator + await powers, tests are executing in serialized order,
+        // one after another. Keep in mind tests itself has to be called synchronously:
+        // setUp()
+        // test1()
+        // tearDown()
+        //
+        // setUp()
+        // test2()
+        // tearDown()
+        // ...
+
+        for (let test of testIterator) {
+            // Proxy will intercept this call
+            try {
+                await test();
+            } catch (err) {
+                this.failedTests.push(err.message);
+            }
+        }
+
+        console.log(` ${color.FgMagenta}[Summary] ${color.Reset}`);
+
+        if (this.failedTests.length) {
+            console.log(` ${color.FgRed} Failed tests: ${this.failedTests.length} ${color.Reset}`);
+            console.log(` ${color.FgRed} ${this.failedTests} ${color.Reset}`);
+        } else {
+            console.log(` ${color.FgGreen}[ALL CLEAN!] ${color.Reset}`);
+        }
     }
 }
 

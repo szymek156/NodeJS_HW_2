@@ -35,8 +35,8 @@ const TestRunner = require("./helpers/test_runner");
 const TestServer = require("./tests/test_server");
 const TestUser   = require("./tests/test_user");
 
-let runner = new TestRunner([/*TestServer,*/ TestUser]);
+let runner = new TestRunner([TestServer, TestUser]);
 
 runner.runAll();
 
-// setTimeout(() => process.exit(), 1000);
+setTimeout(() => process.exit(), 1000);
