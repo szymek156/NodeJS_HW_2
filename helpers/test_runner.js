@@ -18,7 +18,8 @@
 // Author: https://github.com/szymek156
 
 
-const color = require("./console_colors");
+const color  = require("./console_colors");
+const config = require("../config");
 
 class TestRunner {
     constructor(testSuites = []) {
@@ -101,6 +102,12 @@ class TestRunner {
     }
 
     async runAll() {
+        if (!config.developmentEnv) {
+            console.log(
+                ` ${color.FgRed} Test runner can execute only in development build ${color.Reset}`);
+            return;
+        }
+
         let testIterator = this.TestGenerator();
 
         // Thanks to generator + await powers, tests are executing in serialized order,

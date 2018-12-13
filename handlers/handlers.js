@@ -1,4 +1,5 @@
-const _users = require("./users");
+const _users  = require("./users");
+const _tokens = require("./tokens");
 
 let handlers = {};
 
@@ -12,12 +13,26 @@ handlers.users = async function(data) {
     }
 };
 
-handlers.notFound   = async function() { return {status : 404, payload : "Not found"}; };
-handlers.badRequest = async function() { return {status : 400, payload : "Bad request"}; };
+handlers.tokens = async function(data) {
+    let method = data.method;
+
+    if (method in _tokens) {
+        return await _tokens[method](data);
+    } else {
+        return await handlers.badRequest();
+    }
+};
+
+handlers.notFound = async function() {
+    return {status: 404, payload: "Not found"};
+};
+handlers.badRequest = async function() {
+    return {status: 400, payload: "Bad request"};
+};
 
 handlers.echo = async function() {
     console.log("ECHO!!!");
-    return {status : 200, payload : "echo!"};
+    return {status: 200, payload: "echo!"};
 };
 
 module.exports = handlers;

@@ -1,5 +1,6 @@
 const validate = require("../helpers/validate");
 const _data    = require("../helpers/data");
+const helpers  = require("../helpers/helpers");
 
 const USER_DB = "users";
 let users     = {};
@@ -15,6 +16,7 @@ users.get = async function(bytes) {
 
     try {
         let user = await _data.read(USER_DB, email);
+        delete user.password;
         return {status: 200, payload: user};
 
     } catch (err) {
@@ -22,7 +24,7 @@ users.get = async function(bytes) {
     }
 };
 
-// Req param: name, email, address
+// Req param: name, email, address, password
 users.post = async function(data) {
     // console.log("Received payload: ", data.payload);
 
@@ -31,16 +33,20 @@ users.post = async function(data) {
     let record = {
         name: validate.parameter(user.name, "string"),
         email: validate.parameter(user.email, "string"),
-        address: validate.parameter(user.address, "string")
+        address: validate.parameter(user.address, "string"),
+        password: validate.parameter(user.password, "string")
     }
 
-    if (!(record.name && record.email && record.address)) {
+    if (!(record.name && record.email && record.address && record.password)) {
         return {status: 400, payload: "Incorect parameters"};
     }
 
     try {
+        record.password = helpers.hash(record.password);
+
         await _data.create(USER_DB, record.email, record);
 
+        delete record.password;
         return {status: 200, payload: record};
 
     } catch (err) {
@@ -54,10 +60,11 @@ users.put = async function(data) {
     let update = {
         name: validate.parameter(user.name, "string"),
         email: validate.parameter(user.email, "string"),
-        address: validate.parameter(user.address, "string")
+        address: validate.parameter(user.address, "string"),
+        password: validate.parameter(user.password, "string")
     }
 
-    if (!update.email && !(update.name || update.address)) {
+    if (!update.email && !(update.name || update.address || update.password)) {
         return {status: 400, payload: "Incorect parameters"};
     }
 
@@ -72,8 +79,13 @@ users.put = async function(data) {
             user.address = update.address;
         }
 
+        if (update.password) {
+            user.password = helpers.hash(update.password);
+        }
+
         await _data.update(USER_DB, update.email, user);
 
+        delete user.password;
         return {status: 200, payload: user};
 
     } catch (err) {

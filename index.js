@@ -34,8 +34,9 @@ server.init();
 const TestRunner = require("./helpers/test_runner");
 const TestServer = require("./tests/test_server");
 const TestUser   = require("./tests/test_user");
+const TestToken  = require("./tests/test_token");
 
-let runner = new TestRunner([TestServer, TestUser]);
+let runner = new TestRunner([TestServer, TestUser, TestToken]);
 
 runner.runAll();
 
