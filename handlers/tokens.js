@@ -1,37 +1,27 @@
 const validate = require("../helpers/validate");
 const _data    = require("../helpers/data");
 const helpers  = require("../helpers/helpers");
+const config   = require("../config");
 
-const TOKEN_DB = "tokens";
-const USER_DB  = "users";
+const TOKEN_DB = config.TOKEN_DB;
+const USER_DB  = config.USER_DB;
 
 let tokens = {};
 
-// Req param: email
+// Req param: token id
 tokens.get = async function(data) {
     let payload = JSON.parse(data.payload);
 
     let record = {
-        password: validate.parameter(payload.password, "string"),
-        email: validate.parameter(payload.email, "string"),
+        id: validate.parameter(payload.id, "string"),
     }
 
-    if (!(record.email && record.password)) {
+    if (!record.id) {
         return {status: 400, payload: "Incorect parameters"};
     }
 
     try {
-        let user = await _data.read(USER_DB, record.email);
-
-        let hashed = helpers.hash(record.password);
-
-        if (hashed !== user.password) {
-            return {status: 400, payload: "Invalid login"};
-        }
-
-        let token = await _data.read(TOKEN_DB, record.email);
-
-        delete token.password;
+        let token = await _data.read(TOKEN_DB, record.id);
 
         return {status: 200, payload: token};
 
@@ -64,13 +54,13 @@ tokens.post = async function(data) {
         }
 
         let token = {
-            tokenId: helpers.createRandomString(20),
+            id: helpers.createRandomString(20),
             expires: Date.now() + 1000 * 60 * 60,
-            password: hashed
+            email: record.email
         };
 
 
-        await _data.create(TOKEN_DB, record.email, token);
+        await _data.create(TOKEN_DB, token.id, token);
 
         delete token.password;
 
@@ -82,26 +72,26 @@ tokens.post = async function(data) {
     }
 };
 
-// Req params: email, extend
+// Req params: token ID, extend
 tokens.put = async function(data) {
     let payload = JSON.parse(data.payload);
 
     let record = {
         extend: validate.parameter(payload.extend, "boolean"),
-        email: validate.parameter(payload.email, "string"),
+        id: validate.parameter(payload.id, "string"),
     }
 
-    if (!(record.email && record.extend)) {
+    if (!(record.id && record.extend)) {
         return {status: 400, payload: "Incorect parameters"};
     }
 
     try {
-        let token = await _data.read(TOKEN_DB, record.email);
+        let token = await _data.read(TOKEN_DB, record.id);
 
         if (token.expires > Date.now()) {
             token.expires = Date.now() * 1000 * 60 * 60;
 
-            await _data.update(TOKEN_DB, record.email, token);
+            await _data.update(TOKEN_DB, record.id, token);
             return {status: 200, payload: token};
         } else {
             return {status: 400, payload: "Token expired"};
@@ -113,15 +103,15 @@ tokens.put = async function(data) {
 };
 
 tokens.delete = async function(bytes) {
-    let obj   = JSON.parse(bytes.payload);
-    let email = validate.parameter(obj.email, "string");
+    let obj = JSON.parse(bytes.payload);
+    let id  = validate.parameter(obj.id, "string");
 
-    if (!email) {
+    if (!id) {
         return {status: 400, payload: "Incorect parameters"};
     }
 
     try {
-        await _data.delete(TOKEN_DB, email);
+        await _data.delete(TOKEN_DB, id);
         return {status: 200, payload: {}};
 
     } catch (err) {

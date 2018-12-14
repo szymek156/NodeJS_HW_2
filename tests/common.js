@@ -44,7 +44,7 @@ class Common {
         return await Common.syncRequest(requestDetails, JSON.stringify(user));
     };
 
-    static async getUser(email) {
+    static async getUser(email, token) {
         let getData = JSON.stringify(email);
 
         let requestDetails = {
@@ -53,16 +53,18 @@ class Common {
             method: "GET",
             path: "/users",
             port: config.port,
-            headers:
-                {"Content-Type": "application/json", "Content-Length": Buffer.byteLength(getData)}
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(getData),
+                "token": token.id
+            }
         };
 
         return await Common.syncRequest(requestDetails, getData);
     };
 
-    static async deleteUser(email) {
+    static async deleteUser(email, token) {
         let getData = JSON.stringify(email);
-
 
         let requestDetails = {
             protocol: "http:",
@@ -70,14 +72,17 @@ class Common {
             method: "DELETE",
             path: "/users",
             port: config.port,
-            headers:
-                {"Content-Type": "application/json", "Content-Length": Buffer.byteLength(getData)}
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(getData),
+                "token": token.id
+            }
         };
 
         return await Common.syncRequest(requestDetails, getData);
     };
 
-    static async updateUser(user) {
+    static async updateUser(user, token) {
         let strUser = JSON.stringify(user);
 
         let requestDetails = {
@@ -86,8 +91,11 @@ class Common {
             method: "PUT",
             path: "/users",
             port: config.port,
-            headers:
-                {"Content-Type": "application/json", "Content-Length": Buffer.byteLength(strUser)}
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(strUser),
+                "token": token.id
+            }
         };
 
         return await Common.syncRequest(requestDetails, strUser);

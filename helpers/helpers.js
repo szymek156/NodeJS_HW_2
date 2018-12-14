@@ -1,7 +1,5 @@
-const crypto      = require("crypto");
-const config      = require("../config");
-const https       = require("https");
-const querystring = require("querystring");
+const crypto = require("crypto");
+const config = require("../config");
 
 let helpers = {};
 
@@ -61,40 +59,5 @@ helpers.validateParameter = function(parameter, type, possibleValues = [], insta
     return parameter;
 };
 
-helpers.sendTwilioSms = async function(phone, msg) {
-    return new Promise(function(resolve, reject) {
-        phone = this.validateParameter(phone, "string");
-        msg   = this.validateParameter(msg, "string");
-
-        if (!(phone && msg)) {
-            reject("Wrong parameters");
-        }
-
-        let payload = {From: config.twilio.fromPhone, To: `+1${phone}`, Body: msg}
-
-        let strPayload = querystring.stringify(payload);
-
-        let requestDetails = {
-            protocol: "http:",
-            hostname: "localhost/twilio",
-            method: "POST",
-            path: "/aslkfgdjfasdlkflasdjf",
-
-            headers: {
-                "Content-Type": "application/json",
-                "Content-Lenght": Buffer.byteLength(strinPayload)
-            }
-        }
-
-        let req = https.request(requestDetails, function(res) {
-            let status = res.statusCode;
-            if (status == 200) {
-                resolve(res);
-            } else {
-                reject(res);
-            }
-        });
-    });
-};
 
 module.exports = helpers;

@@ -30,6 +30,10 @@ const server = require("./server");
 
 server.init();
 
+
+// TODO: verify token
+
+
 // Unit Testing
 const TestRunner = require("./helpers/test_runner");
 const TestServer = require("./tests/test_server");

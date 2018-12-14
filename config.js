@@ -4,12 +4,16 @@ let environments = {
     production: {
         port: 3000,
         DB_ROOT: path.join(__dirname, "./.data"),
+        USER_DB: "users",
+        TOKEN_DB: "tokens",
         hashingSecret: "this is secret",
     },
 
     development: {
         port: 3000,
         DB_ROOT: path.join(__dirname, "./.data_test"),
+        USER_DB: "users",
+        TOKEN_DB: "tokens",
         hashingSecret: "this is development secret",
         developmentEnv: true
     }

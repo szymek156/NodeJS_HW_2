@@ -1,20 +1,26 @@
 const validate = require("../helpers/validate");
 const _data    = require("../helpers/data");
 const helpers  = require("../helpers/helpers");
+const config   = require("../config");
 
-const USER_DB = "users";
+const USER_DB = config.USER_DB;
 let users     = {};
 
-// Req param: email
+// Req param: email, tokenId
 users.get = async function(bytes) {
     let obj   = JSON.parse(bytes.payload);
     let email = validate.parameter(obj.email, "string");
+    let token = validate.parameter(bytes.headers.token, "string");
 
-    if (!email) {
+    if (!email && !token) {
         return {status: 400, payload: "Incorect parameters"};
     }
 
     try {
+        if (!await validate.token(token, email)) {
+            return {status: 400, payload: "Invalid token"};
+        }
+
         let user = await _data.read(USER_DB, email);
         delete user.password;
         return {status: 200, payload: user};
@@ -55,7 +61,8 @@ users.post = async function(data) {
     }
 };
 users.put = async function(data) {
-    let user = JSON.parse(data.payload);
+    let user  = JSON.parse(data.payload);
+    let token = validate.parameter(data.headers.token, "string");
 
     let update = {
         name: validate.parameter(user.name, "string"),
@@ -64,11 +71,15 @@ users.put = async function(data) {
         password: validate.parameter(user.password, "string")
     }
 
-    if (!update.email && !(update.name || update.address || update.password)) {
+    if (!(update.email && token) && !(update.name || update.address || update.password)) {
         return {status: 400, payload: "Incorect parameters"};
     }
 
     try {
+        if (!await validate.token(token, update.email)) {
+            return {status: 400, payload: "Invalid token"};
+        }
+
         let user = await _data.read(USER_DB, update.email);
 
         if (update.name) {
@@ -93,15 +104,21 @@ users.put = async function(data) {
         return {status: 400, payload: err};
     }
 };
+
+// Req param: phone, tokenId
 users.delete = async function(bytes) {
     let obj   = JSON.parse(bytes.payload);
     let email = validate.parameter(obj.email, "string");
+    let token = validate.parameter(bytes.headers.token, "string");
 
-    if (!email) {
+    if (!email && !token) {
         return {status: 400, payload: "Incorect parameters"};
     }
-
     try {
+        if (!await validate.token(token, email)) {
+            return {status: 400, payload: "Invalid token"};
+        }
+
         let user = await _data.delete(USER_DB, email);
         return {status: 200, payload: user};
 

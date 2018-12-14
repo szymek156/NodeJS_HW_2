@@ -24,12 +24,15 @@ class TestToken extends TestBase {
         let {res: tokenRes, payload: tokenPayload} =
             await Common.createToken({email: user.email, password: user.password});
 
+        let token = JSON.parse(tokenPayload);
+
         assert(tokenRes.statusCode == 200);
+        assert(token.id !== undefined);
 
-        let {res: tokenResGet, payload: tokenPayloadGet} =
-            await Common.getToken({email: user.email, password: user.password});
+        let {res: tokenResGet, payload: tokenPayloadGet} = await Common.getToken({id: token.id});
 
-        assert(tokenResGet.statusCode == 200);
+        assert(tokenResGet.statusCode === 200);
+        assert(tokenPayload === tokenPayloadGet);
     }
 
     async testTokenCantBeCreatedOnWrongCredentials() {
@@ -86,8 +89,10 @@ class TestToken extends TestBase {
 
         assert(tokenRes.statusCode == 200);
 
+        let token = JSON.parse(tokenPayload);
+
         let {res: tokenResPut, payload: tokenPayloadPut} =
-            await Common.updateToken({email: user.email, extend: true});
+            await Common.updateToken({id: token.id, extend: true});
 
         assert(tokenResPut.statusCode == 200);
     }
@@ -109,8 +114,10 @@ class TestToken extends TestBase {
 
         assert(tokenRes.statusCode == 200);
 
+        let token = JSON.parse(tokenPayload);
+
         let {res: tokenResDelete, payload: tokenPayloadDelete} =
-            await Common.deleteToken({email: user.email});
+            await Common.deleteToken({id: token.id});
 
         assert(tokenResDelete.statusCode == 200);
     }

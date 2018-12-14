@@ -19,14 +19,21 @@ class TestUser extends TestBase {
 
         let postUser = JSON.parse(payload);
 
-        delete user.password;
-        console.log("res.status code ", JSON.stringify(user), " \n", JSON.stringify(postUser));
-
         assert(res.statusCode == 200);
         assert(postUser.password === undefined);
+
+        // To get user, you need a token:
+        let {res: tokenRes, payload: tokenPayload} =
+            await Common.createToken({email: user.email, password: user.password});
+
+        assert(tokenRes.statusCode == 200);
+        let token = JSON.parse(tokenPayload);
+
+        delete user.password;
         assert(JSON.stringify(user) === JSON.stringify(postUser));
 
-        let {res: getRes, payload: getPayload} = await Common.getUser({email: user.email});
+        let {res: getRes, payload: getPayload} =
+            await Common.getUser({email: user.email}, {id: token.id});
 
         let getUser = JSON.parse(getPayload);
 
@@ -35,15 +42,30 @@ class TestUser extends TestBase {
         assert(JSON.stringify(user) === JSON.stringify(getUser));
     }
 
+    async testUserCantFetchedWithoutToken() {
+        let user = {
+            name: "Simon",
+            email: "Simon@theClouds.com",
+            address: "5th Ave str",
+            password: "StrongPassword"
+        };
+        let {res, payload} = await Common.createUser(user);
+
+        let postUser = JSON.parse(payload);
+
+        assert(res.statusCode == 200);
+
+        let {res: getRes, payload: getPayload} =
+            await Common.getUser({email: user.email}, {id: "invalid token"});
+
+        assert(getRes.statusCode == 400);
+    }
+
     async testUserWithMissingPropsCannotBeCreated() {
         let                        user = {name: "Andrew", email: "Andrew@theClouds.com"};
         let {res, payload}              = await Common.createUser(user);
 
         assert(res.statusCode == 400);
-
-        let {res: getRes, payload: getPayload} = await Common.getUser({email: user.email});
-
-        assert(getRes.statusCode == 400);
     }
 
     async testUserWithInvalidPropsCannotBeCreated() {
@@ -51,10 +73,6 @@ class TestUser extends TestBase {
         let {res, payload} = await Common.createUser(user);
 
         assert(res.statusCode == 400);
-
-        let {res: getRes, payload: getPayload} = await Common.getUser({email: user.email});
-
-        assert(getRes.statusCode == 400);
     }
 
     async testUserCannotBeCreatedTwice() {
@@ -89,21 +107,27 @@ class TestUser extends TestBase {
             password: "strong password"
         };
         let {res, payload} = await Common.createUser(user);
-
-        delete user.password;
-
         assert(res.statusCode == 200);
 
-        user.name                                                 = "Kevin";
-        let {res: resName, payload: payloadName}                  = await Common.updateUser(user);
+        // To update user, you need a token:
+        let {res: tokenRes, payload: tokenPayload} =
+            await Common.createToken({email: user.email, password: user.password});
+
+        let token = JSON.parse(tokenPayload);
+
+        user.name                                = "Kevin";
+        let {res: resName, payload: payloadName} = await Common.updateUser(user, {id: token.id});
         let                                              userName = JSON.parse(payloadName);
 
         assert(resName.statusCode == 200);
+
+        delete user.password;
         assert(JSON.stringify(user) === JSON.stringify(userName));
 
-        user.address                                   = "Seattle";
-        let {res: resAddress, payload: payloadAddress} = await Common.updateUser(user);
-        let userAddress                                = JSON.parse(payloadAddress);
+        user.address = "Seattle";
+        let {res: resAddress, payload: payloadAddress} =
+            await Common.updateUser(user, {id: token.id});
+        let       userAddress = JSON.parse(payloadAddress);
 
         assert(resAddress.statusCode == 200);
         assert(JSON.stringify(user) === JSON.stringify(userAddress));
@@ -118,14 +142,23 @@ class TestUser extends TestBase {
         };
 
         let {res, payload} = await Common.createUser(user);
-        delete user.password;
 
+        // To update user, you need a token:
+        let {res: tokenRes, payload: tokenPayload} =
+            await Common.createToken({email: user.email, password: user.password});
+
+        let token = JSON.parse(tokenPayload);
+
+
+        delete user.password;
         assert(res.statusCode == 200);
 
-        user.name                                    = "Kevin";
-        user.address                                 = "Seattle";
-        let {res: resUpdate, payload: payloadUpdate} = await Common.updateUser(user);
-        let                                                  userUpdate = JSON.parse(payloadUpdate);
+        user.name    = "Kevin";
+        user.address = "Seattle";
+        let {res: resUpdate, payload: payloadUpdate} =
+            await Common.updateUser(user, {id: token.id});
+
+        let userUpdate = JSON.parse(payloadUpdate);
 
         assert(resUpdate.statusCode == 200);
         assert(JSON.stringify(user) === JSON.stringify(userUpdate));
@@ -143,7 +176,13 @@ class TestUser extends TestBase {
 
         assert(res.statusCode == 200);
 
-        let {res: resUpdate, payload: payloadUpdate} = await Common.updateUser({});
+        // To update user, you need a token:
+        let {res: tokenRes, payload: tokenPayload} =
+            await Common.createToken({email: user.email, password: user.password});
+
+        let token = JSON.parse(tokenPayload);
+
+        let {res: resUpdate, payload: payloadUpdate} = await Common.updateUser({}, {id: token.id});
 
         assert(resUpdate.statusCode == 400);
     }
@@ -160,17 +199,16 @@ class TestUser extends TestBase {
 
         assert(res.statusCode == 200);
 
-        let {res: resDelete, payload: payloadDelete} = await Common.deleteUser({email: user.email});
+        // To delete user, you need a token:
+        let {res: tokenRes, payload: tokenPayload} =
+            await Common.createToken({email: user.email, password: user.password});
+
+        let token = JSON.parse(tokenPayload);
+
+        let {res: resDelete, payload: payloadDelete} =
+            await Common.deleteUser({email: user.email}, {id: token.id});
 
         assert(resDelete.statusCode == 200);
-    }
-
-    async testUserCantBeDeletedIfNotExists() {
-        let user = {name: "Daep", email: "Daep@theClouds.com", address: "Northen Cascades"};
-
-        let {res: resDelete, payload: payloadDelete} = await Common.deleteUser({email: user.email});
-
-        assert(resDelete.statusCode == 400);
     }
 }
 
