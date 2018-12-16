@@ -27,8 +27,56 @@ class TestCart extends TestBase {
         Common.cleanDB("tokens");
     }
 
-    async testCartDummy() {
-        console.log("resultato");
+    async testCartCanBeCreated() {
+        let {res, payload} = await Common.createCart({email: this.user.email}, {id: this.token.id});
+
+        assert(res.statusCode === 200);
+        assert(payload === "{}");
+    }
+
+    async testCartCanBeUpdatedAndFetched() {
+        let {res, payload} = await Common.createCart({email: this.user.email}, {id: this.token.id});
+
+        assert(res.statusCode === 200);
+        assert(payload === "{}");
+
+        let {res: menuRes, payload: menuPayload} =
+            await Common.getMenu({email: this.user.email}, {id: this.token.id});
+
+        assert(res.statusCode === 200);
+
+        let menu = JSON.parse(menuPayload);
+
+        let cart = {items: [menu.salads[0], menu.pizzas[1]]};
+
+        let {res: resUpdate, payload: payloadUpdate} =
+            await Common.updateCart({email: this.user.email, cart: cart}, {id: this.token.id});
+
+        assert(resUpdate.statusCode === 200);
+        assert(payloadUpdate === JSON.stringify(cart));
+
+        let {res: resGet, payload: payloadGet} =
+            await Common.getCart({email: this.user.email}, {id: this.token.id});
+
+        assert(resGet.statusCode === 200);
+        assert(payloadGet === JSON.stringify(cart));
+    }
+
+    async testCartCanBeDeleted() {
+        let {res, payload} = await Common.createCart({email: this.user.email}, {id: this.token.id});
+
+        assert(res.statusCode === 200);
+        assert(payload === "{}");
+
+        let {res: resDel, payload: payloadDel} =
+            await Common.deleteCart({email: this.user.email}, {id: this.token.id});
+
+        assert(resDel.statusCode === 200);
+
+        let {res: resGet, payload: payloadGet} =
+            await Common.getCart({email: this.user.email}, {id: this.token.id});
+
+        assert(resGet.statusCode === 400);
     }
 }
 

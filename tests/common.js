@@ -182,6 +182,79 @@ class Common {
         return await Common.syncRequest(requestDetails, getData);
     };
 
+
+    static async createCart(email, token) {
+        let getData        = JSON.stringify(email);
+        let requestDetails = {
+            protocol: "http:",
+            hostname: "localhost",
+            method: "POST",
+            path: "/cart",
+            port: config.port,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(getData),
+                "token": token.id
+            }
+        };
+
+        return await Common.syncRequest(requestDetails, JSON.stringify(email));
+    };
+
+    static async updateCart(obj, token) {
+        let getData        = JSON.stringify(obj);
+        let requestDetails = {
+            protocol: "http:",
+            hostname: "localhost",
+            method: "PUT",
+            path: "/cart",
+            port: config.port,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(getData),
+                "token": token.id
+            }
+        };
+
+        return await Common.syncRequest(requestDetails, getData);
+    };
+
+    static async getCart(obj, token) {
+        let getData        = JSON.stringify(obj);
+        let requestDetails = {
+            protocol: "http:",
+            hostname: "localhost",
+            method: "GET",
+            path: "/cart",
+            port: config.port,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(getData),
+                "token": token.id
+            }
+        };
+
+        return await Common.syncRequest(requestDetails, getData);
+    };
+
+    static async deleteCart(obj, token) {
+        let getData        = JSON.stringify(obj);
+        let requestDetails = {
+            protocol: "http:",
+            hostname: "localhost",
+            method: "DELETE",
+            path: "/cart",
+            port: config.port,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(getData),
+                "token": token.id
+            }
+        };
+
+        return await Common.syncRequest(requestDetails, getData);
+    }
+
     static cleanDB(dbName) {
         let dir   = path.join(config.DB_ROOT, dbName)
         let files = fs.readdirSync(dir);
