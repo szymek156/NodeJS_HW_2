@@ -8,6 +8,7 @@ let server = {};
 server.router = {
     users: handlers.users,
     tokens: handlers.tokens,
+    menu: handlers.menu,
     echo: handlers.echo
 };
 

@@ -1,7 +1,7 @@
 class TestBase {
     constructor() {}
 
-    setUp() {}
+    async setUp() {}
 
     tearDown() {}
 }

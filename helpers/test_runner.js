@@ -47,7 +47,7 @@ class TestRunner {
                             try {
                                 console.log(executing);
 
-                                target.setUp();
+                                await target.setUp();
                                 await target[prop].call(target, ...argArray);
 
                                 console.log(pass);

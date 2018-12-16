@@ -1,5 +1,7 @@
 const _users  = require("./users");
 const _tokens = require("./tokens");
+const _menu   = require("./menu");
+const _carts  = require("./carts");
 
 let handlers = {};
 
@@ -18,6 +20,26 @@ handlers.tokens = async function(data) {
 
     if (method in _tokens) {
         return await _tokens[method](data);
+    } else {
+        return await handlers.badRequest();
+    }
+};
+
+handlers.menu = async function(data) {
+    let method = data.method;
+
+    if (method in _menu) {
+        return await _menu[method](data);
+    } else {
+        return await handlers.badRequest();
+    }
+};
+
+handlers.carts = async function(data) {
+    let method = data.method;
+
+    if (method in _carts) {
+        return await _carts[method](data);
     } else {
         return await handlers.badRequest();
     }

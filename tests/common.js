@@ -163,6 +163,25 @@ class Common {
         return await Common.syncRequest(requestDetails, strToken);
     };
 
+    static async getMenu(email, token) {
+        let getData = JSON.stringify(email);
+
+        let requestDetails = {
+            protocol: "http:",
+            hostname: "localhost",
+            method: "GET",
+            path: "/menu",
+            port: config.port,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(getData),
+                "token": token.id
+            }
+        };
+
+        return await Common.syncRequest(requestDetails, getData);
+    };
+
     static cleanDB(dbName) {
         let dir   = path.join(config.DB_ROOT, dbName)
         let files = fs.readdirSync(dir);

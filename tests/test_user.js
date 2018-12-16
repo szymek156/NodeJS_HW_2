@@ -210,6 +210,47 @@ class TestUser extends TestBase {
 
         assert(resDelete.statusCode == 200);
     }
+
+    async testUserCanReadMenu() {
+        let user = {
+            name: "Daep",
+            email: "Daep@theClouds.com",
+            address: "Northen Cascades",
+            password: "StrongPassword"
+        };
+
+        let {res, payload} = await Common.createUser(user);
+
+        assert(res.statusCode == 200);
+
+        let {res: tokenRes, payload: tokenPayload} =
+            await Common.createToken({email: user.email, password: user.password});
+
+        let token = JSON.parse(tokenPayload);
+
+        let {res: resMenu, payload: payloadMenu} =
+            await Common.getMenu({email: user.email}, {id: token.id});
+
+        assert(resMenu.statusCode == 200);
+    }
+
+    async testUserCantReadMenuIfNotLoggedIn() {
+        let user = {
+            name: "Daep",
+            email: "Daep@theClouds.com",
+            address: "Northen Cascades",
+            password: "StrongPassword"
+        };
+
+        let {res, payload} = await Common.createUser(user);
+
+        assert(res.statusCode == 200);
+
+        let {res: resMenu, payload: payloadMenu} =
+            await Common.getMenu({email: user.email}, {id: "qwerty"});
+
+        assert(resMenu.statusCode == 400);
+    }
 }
 
 module.exports = TestUser;

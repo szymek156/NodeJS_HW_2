@@ -39,8 +39,9 @@ const TestRunner = require("./helpers/test_runner");
 const TestServer = require("./tests/test_server");
 const TestUser   = require("./tests/test_user");
 const TestToken  = require("./tests/test_token");
+const TestCart   = require("./tests/test_cart");
 
-let runner = new TestRunner([TestServer, TestUser, TestToken]);
+let runner = new TestRunner([TestServer, TestUser, TestToken, TestCart]);
 
 runner.runAll();
 
