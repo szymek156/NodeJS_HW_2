@@ -30,17 +30,19 @@ const server = require("./server");
 
 server.init();
 
-// Unit Testing
+// // Unit Testing
 const TestRunner = require("./helpers/test_runner");
 const TestServer = require("./tests/test_server");
 const TestUser   = require("./tests/test_user");
 const TestToken  = require("./tests/test_token");
 const TestCart   = require("./tests/test_cart");
 
-let runner = new TestRunner([TestServer, TestUser, TestToken, TestCart]);
+let runner = new TestRunner([/*TestServer, TestUser, TestToken,*/ TestCart]);
 
 let exitNodeAfterFinish = true;
 runner.runAll(exitNodeAfterFinish);
+
+
 
 // let https           = require("https");
 // const StringDecoder = require("string_decoder").StringDecoder;

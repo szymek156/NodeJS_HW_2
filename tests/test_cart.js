@@ -5,12 +5,8 @@ const Common   = require("./common");
 class TestCart extends TestBase {
     async setUp() {
         // Create and login user
-        this.user = {
-            name: "Joey",
-            email: "Joey@theClouds.com",
-            address: "Redmond",
-            password: "strong password"
-        };
+        this.user =
+            {name: "Joey", email: "qaz2ws@o2.pl", address: "Redmond", password: "strong password"};
 
         let {res, payload} = await Common.createUser(this.user);
         assert(res.statusCode === 200);
@@ -35,6 +31,7 @@ class TestCart extends TestBase {
     }
 
     async testCartCanBeUpdatedAndFetched() {
+        // Create cart, select something
         let {res, payload} = await Common.createCart({email: this.user.email}, {id: this.token.id});
 
         assert(res.statusCode === 200);
@@ -81,6 +78,7 @@ class TestCart extends TestBase {
 
 
     async testCartProceedToCheckout() {
+        // Create cart, select something
         await Common.createCart({email: this.user.email}, {id: this.token.id});
 
         let {res: menuRes, payload: menuPayload} =
@@ -92,6 +90,7 @@ class TestCart extends TestBase {
 
         await Common.updateCart({email: this.user.email, cart: cart}, {id: this.token.id});
 
+        // Proceed to checkout
         let {res: checkoutRes, payload: checkoutPayload} =
             await Common.postCart({email: this.user.email}, {id: this.token.id});
 

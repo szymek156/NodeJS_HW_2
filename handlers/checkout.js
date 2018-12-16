@@ -35,17 +35,81 @@ checkout.post = async function(bytes) {
             source: "tok_visa"
         };
 
-        let answer = await checkout.placeOrder(order);
+        let answerPayment = await checkout.placeOrder(order);
 
-        console.log(answer.res.statusCode);
-        console.log(answer.payload);
-        return {status: answer.res.statusCode, payload: answer.payload};
+        // Send a mail with a receipt
+        if (answerPayment.res.statusCode == 200) {
+            let answerMail = await checkout.sendInvoice(JSON.parse(answerPayment.payload), email);
 
-
+            return {status: answerMail.res.statusCode, payload: answerMail.payload};
+        } else {
+            return {status: answerPayment.res.statusCode, payload: answerPayment.payload};
+        }
     } catch (err) {
         return {status: 400, payload: err};
     }
 };
+
+checkout.sendInvoice = async function(order, email) {
+    // Let's pretend sending invoices in JSON format is common thing in this world
+    let invoice = {
+        amount: order.amount / 100,
+        currency: order.currency,
+        description: order.description,
+        date: JSON.stringify(new Date(order.created).toLocaleDateString()),
+        last4: order.source.last4,
+        expDate: order.source.exp_month.toString() + "/" + order.source.exp_year.toString()
+    };
+
+    let payload = {
+        from: "Mailgun Sandbox <postmaster@sandboxa54fd0f0c6e24f6bb1a68f05cc647193.mailgun.org>",
+        to: email,
+        subject: `Your Invoice for ${order.description} is ready`,
+        text: JSON.stringify(invoice)
+    };
+
+    let stringPayload = querystring.stringify(payload);
+
+    let requestDetails = {
+        "protocol": "https:",
+        "hostname": "api.mailgun.net",
+        "method": "POST",
+        "path": "/v3/sandboxa54fd0f0c6e24f6bb1a68f05cc647193.mailgun.org/messages",
+        "auth": "api:23604d0babe3660974dd15090d733e8c-b3780ee5-3dd0f9ab",
+        "headers": {
+            "Content-Length": Buffer.byteLength(stringPayload),
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        let req = https.request(requestDetails, function(res) {
+            // Callback successfully if the request went through
+            let decoder = new StringDecoder("utf-8");
+            let buffer  = "";
+
+            res.on("data", function(chunk) {
+                buffer += decoder.write(chunk);
+            });
+            res.on("end", function() {
+                buffer += decoder.end();
+                resolve({res: res, payload: buffer});
+            });
+        });
+
+        // Bind to the error event so it doesn't get thrown
+        req.on("error", function(e) {
+            reject(e);
+        });
+
+        // Add the payload
+        req.write(stringPayload);
+
+        // End the request
+        req.end();
+    });
+};
+
 
 checkout.placeOrder = async function(order) {
     let stringPayload = querystring.stringify(order);

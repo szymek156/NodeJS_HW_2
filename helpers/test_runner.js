@@ -111,7 +111,8 @@ class TestRunner {
         let testIterator = this.TestGenerator();
 
         // Thanks to generator + await powers, tests are executing in serialized order,
-        // one after another. Keep in mind tests itself has to be called synchronously:
+        // one after another. Keep in mind tests itself has to be written in synchronous
+        // manner:
         // setUp()
         // test1()
         // tearDown()
