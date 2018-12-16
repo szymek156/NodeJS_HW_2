@@ -60,6 +60,7 @@ users.post = async function(data) {
         return {status: 400, payload: err};
     }
 };
+
 users.put = async function(data) {
     let user  = JSON.parse(data.payload);
     let token = validate.parameter(data.headers.token, "string");
@@ -105,7 +106,7 @@ users.put = async function(data) {
     }
 };
 
-// Req param: phone, tokenId
+// Req param: email, tokenId
 users.delete = async function(bytes) {
     let obj   = JSON.parse(bytes.payload);
     let email = validate.parameter(obj.email, "string");

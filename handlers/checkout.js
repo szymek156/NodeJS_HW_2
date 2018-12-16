@@ -8,6 +8,7 @@ const https         = require("https");
 const CART_DB = config.CART_DB;
 let checkout  = {};
 
+// Posts current cart to payment and sends invoice
 // Req param: email, tokenId
 checkout.post = async function(bytes) {
     let obj   = JSON.parse(bytes.payload);
@@ -37,9 +38,13 @@ checkout.post = async function(bytes) {
 
         let answerPayment = await checkout.placeOrder(order);
 
+
+
         // Send a mail with a receipt
         if (answerPayment.res.statusCode == 200) {
             let answerMail = await checkout.sendInvoice(JSON.parse(answerPayment.payload), email);
+
+            console.log(answerMail.res.statusCode, answerMail.payload);
 
             return {status: answerMail.res.statusCode, payload: answerMail.payload};
         } else {
@@ -121,7 +126,6 @@ checkout.placeOrder = async function(order) {
         "path": "/v1/charges",
         "auth": "sk_test_4eC39HqLyjWDarjtT1zdp7dc",
         "headers": {
-            //"Authorization": "Basic c2tfdGVzdF80ZUMzOUhxTHlqV0Rhcmp0VDF6ZHA3ZGM6",
             "Content-Length": Buffer.byteLength(stringPayload),
             "User-Agent": "node",
             "Accept": "*/*",

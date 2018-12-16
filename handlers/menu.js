@@ -1,12 +1,11 @@
 const validate = require("../helpers/validate");
 const _data    = require("../helpers/data");
-const helpers  = require("../helpers/helpers");
 const config   = require("../config");
 
-const USER_DB = config.USER_DB;
 const MENU_DB = config.MENU_DB;
 let menu      = {};
 
+// Returns menu, only for logged users
 // Req param: email, tokenId
 menu.get = async function(bytes) {
     let obj   = JSON.parse(bytes.payload);

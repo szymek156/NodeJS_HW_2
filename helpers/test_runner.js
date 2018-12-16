@@ -21,14 +21,26 @@
 const color  = require("./console_colors");
 const config = require("../config");
 
+// Yet another test runner, pass to constructor classes which has setUp, tearDown methods defined.
+// They are called before every single test case execution. You would want to inherit from TestBase
+// which has those methods implemented. Test cases should be named with "test" prefix. Runner
+// recognizes test cases by this naming convention. For example: testTwoIsPrime() Note the fact
+// runner asumes  test cases are written in synchronous manner, which means, after a call: await
+// testTwoIsPrime(), EVERYTHING related with that test is finished, and is safe to call tearDown
+// method.
+
+// Internals:
+// testSuites collection contains Class types of Suites, constructor creates instances of them,
+// and opaques it up with proxy object. Proxy will intercept function calls with name
+// starting as test*. Proxy returns function where test* is wrapped by setUp and
+// tearDown functions.
+//
+// runAll method uses generator to fetch next test case, calls it synchronously (await testCase)
+// and collects another test case from generator.
 class TestRunner {
     constructor(testSuites = []) {
         this.failedTests = [];
         this.testSuites  = testSuites.map((SuiteClass) => {
-            // testSuites collection contains Class types of Suites, create instances of them,
-            // and opaque it up with proxy object. Proxy will intercept function calls with name
-            // starting as test*. Proxy returns function where test* is wrapped by setUp and
-            // tearDown functions.
             let proxy = new Proxy(new SuiteClass, {
                 get: function(target, prop, receiver) {
                     // Wrap functions starting with test* to with setUp and tearDown methods, and
@@ -101,6 +113,8 @@ class TestRunner {
         }
     }
 
+    // Run all tests provided in TestSuites, upon creating this object
+    // @param exitProcessAtEnd - defines if after running all tests, node should exit
     async runAll(exitProcessAtEnd) {
         if (!config.developmentEnv) {
             console.log(

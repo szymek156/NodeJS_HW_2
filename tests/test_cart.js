@@ -1,6 +1,7 @@
 const assert   = require("assert");
 const TestBase = require("./test_base");
 const Common   = require("./common");
+const config   = require("./../config");
 
 class TestCart extends TestBase {
     async setUp() {
@@ -19,8 +20,9 @@ class TestCart extends TestBase {
     }
 
     tearDown() {
-        Common.cleanDB("users");
-        Common.cleanDB("tokens");
+        Common.cleanDB(config.USER_DB);
+        Common.cleanDB(config.TOKEN_DB);
+        Common.cleanDB(config.CART_DB);
     }
 
     async testCartCanBeCreated() {
@@ -45,6 +47,8 @@ class TestCart extends TestBase {
         let menu = JSON.parse(menuPayload);
 
         let cart = {items: [menu.salads[0], menu.pizzas[1]]};
+
+        console.log(cart);
 
         let {res: resUpdate, payload: payloadUpdate} =
             await Common.updateCart({email: this.user.email, cart: cart}, {id: this.token.id});

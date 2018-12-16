@@ -6,6 +6,7 @@ const CART_DB = config.CART_DB;
 
 let cart = {};
 
+// Returns current cart
 // Req param: email, tokenId === cartId
 cart.get = async function(bytes) {
     let obj   = JSON.parse(bytes.payload);
@@ -30,6 +31,7 @@ cart.get = async function(bytes) {
     }
 };
 
+// Creates new, empty cart, it's 1 to 1 mapping to tokenId
 // Req param: email, tokenId===cartId
 cart.post = async function(data) {
     let obj   = JSON.parse(data.payload);
@@ -56,6 +58,7 @@ cart.post = async function(data) {
     }
 };
 
+// Updated cart, gives posibility to add/remove items
 // Req param email, token, cart
 cart.put = async function(data) {
     let obj   = JSON.parse(data.payload);
@@ -82,6 +85,7 @@ cart.put = async function(data) {
     }
 };
 
+// Deletes cart, which can be interpreted as cleaning basked
 // Req param: phone, tokenId
 cart.delete = async function(bytes) {
     let obj   = JSON.parse(bytes.payload);

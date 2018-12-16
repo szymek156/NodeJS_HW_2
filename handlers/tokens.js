@@ -31,6 +31,7 @@ tokens.get = async function(data) {
     }
 };
 
+// Creates new token, makes user with email logged in
 // Req param: email, password
 tokens.post = async function(data) {
     let payload = JSON.parse(data.payload);
@@ -72,6 +73,7 @@ tokens.post = async function(data) {
     }
 };
 
+// Gives posibility to extend login session time
 // Req params: token ID, extend
 tokens.put = async function(data) {
     let payload = JSON.parse(data.payload);
@@ -102,6 +104,8 @@ tokens.put = async function(data) {
     }
 };
 
+// Removes token - logs out user
+// Req param: tokenId
 tokens.delete = async function(bytes) {
     let obj = JSON.parse(bytes.payload);
     let id  = validate.parameter(obj.id, "string");
