@@ -1,5 +1,4 @@
 {
-    "menu": {
         "salads": [
 
             {
@@ -41,5 +40,4 @@
                 "description" : "Chicken, Ranch, Olives, Zucchini, Tomatoes, Mushrooms, Onions, Garlic (optional)",
                 "price" : 8.00
             }]
-    }
 }
