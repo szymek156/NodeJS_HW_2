@@ -101,7 +101,7 @@ class TestRunner {
         }
     }
 
-    async runAll() {
+    async runAll(exitProcessAtEnd) {
         if (!config.developmentEnv) {
             console.log(
                 ` ${color.FgRed} Test runner can execute only in development build ${color.Reset}`);
@@ -142,6 +142,11 @@ class TestRunner {
             console.log(` ${color.FgGreen}[ === ALL CLEAN! === ] ${color.Reset}`);
             // :)
             process.stdout.write("\x07");
+        }
+
+        if (exitProcessAtEnd) {
+            console.log(` ${color.FgMagenta}[ Process Exits ] ${color.Reset}`);
+            process.exit(0);
         }
     }
 }

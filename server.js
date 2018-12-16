@@ -10,6 +10,7 @@ server.router = {
     tokens: handlers.tokens,
     menu: handlers.menu,
     cart: handlers.carts,
+    checkout: handlers.checkout,
     echo: handlers.echo
 };
 

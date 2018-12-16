@@ -255,6 +255,24 @@ class Common {
         return await Common.syncRequest(requestDetails, getData);
     }
 
+    static async postCart(obj, token) {
+        let getData        = JSON.stringify(obj);
+        let requestDetails = {
+            protocol: "http:",
+            hostname: "localhost",
+            method: "POST",
+            path: "/checkout",
+            port: config.port,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(getData),
+                "token": token.id
+            }
+        };
+
+        return await Common.syncRequest(requestDetails, getData);
+    }
+
     static cleanDB(dbName) {
         let dir   = path.join(config.DB_ROOT, dbName)
         let files = fs.readdirSync(dir);

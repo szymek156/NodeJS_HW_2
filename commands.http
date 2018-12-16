@@ -1,0 +1,11 @@
+
+POST https://api.stripe.com/v1/charges
+Authorization: Basic c2tfdGVzdF80ZUMzOUhxTHlqV0Rhcmp0VDF6ZHA3ZGM6
+User-Agent: curl/7.47.0
+Accept: */*
+Content-Length: 66
+Content-Type: application/x-www-form-urlencoded
+
+amount=999
+currency=usd
+source=tok_visa

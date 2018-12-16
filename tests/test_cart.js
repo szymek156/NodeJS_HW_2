@@ -78,6 +78,26 @@ class TestCart extends TestBase {
 
         assert(resGet.statusCode === 400);
     }
+
+
+    async testCartProceedToCheckout() {
+        await Common.createCart({email: this.user.email}, {id: this.token.id});
+
+        let {res: menuRes, payload: menuPayload} =
+            await Common.getMenu({email: this.user.email}, {id: this.token.id});
+
+        let menu = JSON.parse(menuPayload);
+
+        let cart = {items: [menu.salads[0], menu.pizzas[1]]};
+
+        await Common.updateCart({email: this.user.email, cart: cart}, {id: this.token.id});
+
+        let {res: checkoutRes, payload: checkoutPayload} =
+            await Common.postCart({email: this.user.email}, {id: this.token.id});
+
+
+        assert(checkoutRes.statusCode === 200);
+    }
 }
 
 module.exports = TestCart;
