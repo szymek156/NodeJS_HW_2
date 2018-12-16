@@ -67,7 +67,7 @@ checkout.sendInvoice = async function(order, email) {
     };
 
     let payload = {
-        from: "Mailgun Sandbox <postmaster@sandboxa54fd0f0c6e24f6bb1a68f05cc647193.mailgun.org>",
+        from: `Mailgun Sandbox <postmaster@${config.sandboxDomain}>`,
         to: email,
         subject: `Your Invoice for ${order.description} is ready`,
         text: JSON.stringify(invoice)
@@ -79,8 +79,8 @@ checkout.sendInvoice = async function(order, email) {
         "protocol": "https:",
         "hostname": "api.mailgun.net",
         "method": "POST",
-        "path": "/v3/sandboxa54fd0f0c6e24f6bb1a68f05cc647193.mailgun.org/messages",
-        "auth": "api:23604d0babe3660974dd15090d733e8c-b3780ee5-3dd0f9ab",
+        "path": `/v3/${config.sandboxDomain}/messages`,
+        "auth": `api:${config.mailgunApiKey}`,
         "headers": {
             "Content-Length": Buffer.byteLength(stringPayload),
             "Content-Type": "application/x-www-form-urlencoded"

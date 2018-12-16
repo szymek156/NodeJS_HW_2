@@ -10,7 +10,9 @@ let environments = {
         port: 3000,
         DB_ROOT: path.join(__dirname, "./.data_test"),
         hashingSecret: "this is development secret",
-        developmentEnv: true
+        developmentEnv: true,
+        sandboxDomain: "sandboxa54fd0f0c6e24f6bb1a68f05cc647193.mailgun.org",
+        mailgunApiKey: "23604d0babe3660974dd15090d733e8c-b3780ee5-3dd0f9ab"
     }
 };
 

@@ -48,8 +48,6 @@ class TestCart extends TestBase {
 
         let cart = {items: [menu.salads[0], menu.pizzas[1]]};
 
-        console.log(cart);
-
         let {res: resUpdate, payload: payloadUpdate} =
             await Common.updateCart({email: this.user.email, cart: cart}, {id: this.token.id});
 
